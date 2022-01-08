@@ -182,6 +182,46 @@ void q_reverse(queue_t *q)
     return;
 }
 
+void mergesort(list_ele_t **head)
+{
+    if (*head == NULL || (*head)->next == NULL) {
+        return;
+    }
+
+    // split
+    list_ele_t *slow = *head;
+    list_ele_t *fast = (*head)->next;
+    while (fast && fast->next) {
+        fast = fast->next->next;
+        slow = slow->next;
+    }
+    list_ele_t *h1 = *head;
+    list_ele_t *h2 = slow->next;
+    slow->next = NULL;
+
+    mergesort(&h1);
+    mergesort(&h2);
+
+    // sorting sorted list, including 2 single elements
+    *head = NULL;
+    list_ele_t **tmp =
+        head;  // not to change head, but want to change linked elements
+
+    while (h1 && h2) {
+        if (strcmp(h1->value, h2->value) < 1) {
+            *tmp = h1;
+            h1 = h1->next;
+        } else {
+            *tmp = h2;
+            h2 = h2->next;
+        }
+        tmp = &(*tmp)->next;
+    }
+    *tmp = h1 ? h1 : h2;  // complete the rest if there are any remain
+
+    return;
+}
+
 /*
  * Sort elements of queue in ascending order
  * No effect if q is NULL or empty. In addition, if q has only one
@@ -189,6 +229,11 @@ void q_reverse(queue_t *q)
  */
 void q_sort(queue_t *q)
 {
-    /* TODO: You need to write the code for this function */
-    /* TODO: Remove the above comment when you are about to implement. */
+    if (!q || !q->head) {
+        return;
+    }
+    mergesort(&q->head);
+    while (q->tail->next) {
+        q->tail = q->tail->next;
+    }
 }
